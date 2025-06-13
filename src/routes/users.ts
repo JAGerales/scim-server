@@ -1,14 +1,12 @@
 import { Router } from 'express';
-import type { Application } from 'express';
 import UsersController from '../controllers/usersController';
 
 const router = Router();
 const usersController = new UsersController();
 
-// Define user routes
-export function setUserRoutes(app: Application) {
-    app.post('/users', usersController.createUser.bind(usersController));
-    app.get('/users/:id', usersController.getUser.bind(usersController));
-    app.put('/users/:id', usersController.updateUser.bind(usersController));
-    app.delete('/users/:id', usersController.deleteUser.bind(usersController));
-}
+router.post('/Users', usersController.createUser.bind(usersController));
+router.get('/Users/:id', usersController.getUser.bind(usersController));    
+router.put('/Users/:id', usersController.updateUser.bind(usersController));
+router.delete('/Users/:id', usersController.deleteUser.bind(usersController));
+
+export default router;

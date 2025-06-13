@@ -1,16 +1,28 @@
-import { jsonToScim } from "../utils/jsonToScim";
+import { jsonToScimUser, jsonToScimGroup } from "../utils/jsonToScim";
 import { UserService } from "../services/userService";
 import { GroupService } from "../services/groupService";
 import express, { Request, Response } from 'express';
 
 class UsersController {
+    /* Required for POST
+{
+  "accountEnabled": true,
+  "displayName": "Jacob Gerales",
+  "mailNickname": "jgerales",
+  "userPrincipalName": "jgerales@yourdomain.com",
+  "passwordProfile": {
+    "forceChangePasswordNextSignIn": true,
+    "password": "YourStrongP@ssword123"
+  }
+}
+    */
     async createUser(req: Request, res: Response) {
         // Logic to create a user
-        const userData = req.body;
+        const userData = req.body; // VALIDATE USERDATA BEFORE OPERATIONS
         const userService = new UserService();
         try {
-            const user = userService.createUser(userData);
-            res.status(201).json(jsonToScim(user, 'user')); // Respond back to BambooHR
+            const user = await userService.createUser(userData);
+            res.status(201).json(user); // Respond back to BambooHR
         } catch (error: any) {
             res.status(400).json({ error: error.message });
         }

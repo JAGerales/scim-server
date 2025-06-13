@@ -1,34 +1,84 @@
-export function jsonToScim(userOrGroup: any, type: 'user' | 'group') {
-    if (type === 'user') {
-        return {
+import { User, Group, CustomUserExtension } from "../types/index";
+
+function jsonToScimUser(rawUser: any): User & CustomUserExtension {
+        return { // ENSURE THIS HANDLES DATE PARSING
             schemas: [
                 "urn:ietf:params:scim:schemas:core:2.0:User",
                 "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User"
             ],
-            id: userOrGroup.id,
-            userName: userOrGroup.username,
-            name: {
-                givenName: userOrGroup.firstName,
-                familyName: userOrGroup.lastName
+            meta:{
+                resourceType: "User",
+                created: new Date().toISOString(),
+                lastModified: new Date().toISOString(),
+                location: `https://api.example.com/scim/v2/Users/${rawUser.id}` //UPDATE
             },
+            id: rawUser.id,
+            userName: rawUser.username,
+            name: {
+                givenName: rawUser.firstName,
+                familyName: rawUser.lastName
+            },
+            displayName: rawUser.displayName,
             emails: [
                 {
-                    value: userOrGroup.email,
+                    value: rawUser.email,
+                    type: "work",
                     primary: true
                 }
             ],
-            active: userOrGroup.active
+            active: rawUser.active,
+            "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User": {
+                employeeId: rawUser?.employeeId ?? '',
+                department: rawUser.department,
+                office: rawUser.office,
+                title: rawUser.title,
+                phoneNumber: rawUser.phoneNumber,
+                manager: rawUser.manager ? {
+                    id: rawUser.manager.id,
+                    display: rawUser.manager.displayName
+                } : undefined
+            }
+            
         };
-    } else if (type === 'group') {
+}
+
+function jsonToScimGroup(rawGroup: any):  Group {
         return {
-            schemas: ["urn:ietf:params:scim:schemas:core:2.0:Group"],
-            id: userOrGroup.id,
-            displayName: userOrGroup.name,
-            members: userOrGroup.members.map((member: any) => ({
+            schemas: [
+                "urn:ietf:params:scim:schemas:core:2.0:Group",
+                "urn:ietf:params:scim:schemas:extension:enterprise:2.0:Group"
+            ],
+            meta:{
+                resourceType: "Group",
+                created: new Date().toISOString(),
+                lastModified: new Date().toISOString(),
+                location: `https://api.example.com/scim/v2/Groups/${rawGroup.id}` //UPDATE
+            },
+            id: rawGroup.id,
+            name: rawGroup.name,
+            endpoint: rawGroup.endpoint,
+            description: rawGroup.description,
+            members: rawGroup.members?.map((member: any) => ({
                 value: member.id,
                 display: member.displayName
             }))
         };
-    }
-    throw new Error('Invalid type provided. Must be "user" or "group".');
 }
+
+export { jsonToScimGroup, jsonToScimUser };
+/*
+export const convertToScimUser = (bambooJson: any): any => {
+  return {
+    schemas: ["urn:ietf:params:scim:schemas:core:2.0:User"],
+    userName: bambooJson.workEmail,
+    name: {
+      givenName: bambooJson.firstName,
+      familyName: bambooJson.lastName,
+    },
+    active: true,
+    emails: [{ value: bambooJson.workEmail, primary: true }],
+    externalId: bambooJson.id,
+  };
+};
+
+*/
