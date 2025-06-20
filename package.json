@@ -5,6 +5,7 @@
   "main": "src/app.ts",
   "scripts": {
     "start": "ts-node src/app.ts",
+    "poll-bamboo": "node jobs/pollBamboo.js",
     "build": "tsc",
     "test": "jest"
   },
@@ -12,7 +13,9 @@
     "axios": "^1.9.0",
     "body-parser": "^1.19.0",
     "dotenv": "^16.5.0",
-    "express": "^4.21.2"
+    "express": "^4.21.2",
+    "lowdb": "^7.0.1",
+    "zod": "^3.25.67"
   },
   "devDependencies": {
     "@types/express": "^4.17.13",

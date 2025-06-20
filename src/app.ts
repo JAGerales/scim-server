@@ -1,9 +1,11 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import router from './routes/users';
+import { initDB } from './services/userStore';  
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+initDB(); // Initialize the database
 
 app.use(bodyParser.json());
 app.use(express.json());

@@ -1,11 +1,10 @@
 import { jsonToScimUser, jsonToScimGroup } from '../utils/jsonToScim';
+import { addUser } from './userStore';
 
 export class UserService {
-    private users: any[] = [];
-
     async createUser(userData: any[]) {
         const newUser = jsonToScimUser(userData); // pass 'user' or 'group' based on context
-        this.users.push(newUser); // ADD USER TO MEMORY STORE
+        await addUser(newUser); // Store the user in the database or any storage
         return newUser;
         // DO NOT RETURN NEWUSER, CONVERT SCIM -> GRAPH MAPPING TO AZURE AD TO CREATE USER IN TENANT
         // USE AXIOS TO MAKE HTTP REQUEST

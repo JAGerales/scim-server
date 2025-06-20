@@ -2,6 +2,7 @@ import { jsonToScimUser, jsonToScimGroup } from "../utils/jsonToScim";
 import { UserService } from "../services/userService";
 import { GroupService } from "../services/groupService";
 import express, { Request, Response } from 'express';
+import { bambooUserSchema } from "../utils/userValidators";
 
 class UsersController {
     /* Required for POST
@@ -18,10 +19,10 @@ class UsersController {
     */
     async createUser(req: Request, res: Response) {
         // Logic to create a user
-        const userData = req.body; // VALIDATE USERDATA BEFORE OPERATIONS
+        const userData = bambooUserSchema.parse(req.body); // VALIDATE USERDATA BEFORE OPERATIONS
         const userService = new UserService();
         try {
-            const user = await userService.createUser(userData);
+            const user = await userService.createUser([userData]);
             res.status(201).json(user); // Respond back to BambooHR
         } catch (error: any) {
             res.status(400).json({ error: error.message });
