@@ -7,9 +7,10 @@ const apiKey = process.env.BAMBOOHR_API_KEY;
 
 let lastEmployeeIds = new Set();
 
+// propsed api endpoint: https://api.bamboohr.com/api/gateway.php/brightmachines/v1/employees/1300?fields=firstName,lastName,displayName,workEmail,jobTitle,department,location,mobilePhone,employeeNumber,supervisor
 async function fetchEmployees() {
   try {
-    const response = await axios.get(`https://${subdomain}.bamboohr.com/api/gateway.php/${subdomain}/v1/employees/directory`, {
+    const response = await axios.get(`https://api.bamboohr.com/api/gateway.php/${subdomain}/v1/employees/directory`, {
       auth: {
         username: apiKey,
         password: ''

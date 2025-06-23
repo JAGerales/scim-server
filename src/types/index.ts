@@ -28,6 +28,7 @@ export interface CustomUserExtension {
     office?: string;
     title?: string;
     phoneNumber?: string;
+    supervisor?: string;
 }
 
 export interface Group {

@@ -8,6 +8,7 @@ export const bambooUserSchema = z.object({
   preferredName: z.string().nullable().optional(), // ✅ allows null
   jobTitle: z.string().optional(),
   mobilePhone: z.string().optional(),
+  employeeNumber: z.string().optional(),
   workEmail: z.string().email(),
   department: z.string().optional(),
   location: z.string().optional(),

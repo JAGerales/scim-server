@@ -2,7 +2,7 @@ import { User, Group, CustomUserExtension } from "../types/index";
 
 function jsonToScimUser(rawUser: any): User & CustomUserExtension {
 console.log("Converting raw user to SCIM format:", rawUser);
-console.log("Raw user ID:", rawUser[0].id);
+console.log("Raw user ID:", rawUser[0].supervisor);
 return {
   schemas: [
     "urn:ietf:params:scim:schemas:core:2.0:User",
@@ -12,9 +12,9 @@ return {
     resourceType: "User",
     created: new Date().toISOString(),
     lastModified: new Date().toISOString(),
-    location: `https://api.example.com/scim/v2/Users/${rawUser[0].id}`
+    location: `https://api.example.com/scim/v2/Users/${rawUser[0].employeeNumber}`
   },
-  id: rawUser[0].id,
+  id: rawUser[0].employeeNumber,
   userName: rawUser[0].workEmail, 
   name: {
     givenName: rawUser[0].firstName,
@@ -29,11 +29,12 @@ return {
     }
   ],
   "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User": {
-    employeeId: rawUser[0].id,
+    employeeId: rawUser[0].employeeNumber,
     department: rawUser[0].department,
     office: rawUser[0].location,
     title: rawUser[0].jobTitle,
     phoneNumber: rawUser[0].mobilePhone,
+    supervisor: rawUser[0].supervisor
   }
 };
 
