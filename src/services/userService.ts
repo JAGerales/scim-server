@@ -33,18 +33,5 @@ export class UserService {
         }
         return null;
     }
-
-    private jsonToScim(userData: any) {
-        // Convert JSON payload to SCIM format
-        return {
-            id: userData.id,
-            userName: userData.username,
-            name: {
-                givenName: userData.firstName,
-                familyName: userData.lastName
-            },
-            emails: [{ value: userData.email }]
-        };
-    }
         */
 }
