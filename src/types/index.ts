@@ -18,7 +18,6 @@ export interface User {
         type: string;
         primary: boolean;
     }>;
-    active: boolean;
 
     'urn:ietf:params:scim:schemas:extension:enterprise:2.0:User'?: CustomUserExtension;
 }
@@ -29,10 +28,6 @@ export interface CustomUserExtension {
     office?: string;
     title?: string;
     phoneNumber?: string;
-    manager?: {
-        id: string;
-        display?: string;
-    };
 }
 
 export interface Group {

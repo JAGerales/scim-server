@@ -19,12 +19,19 @@ class UsersController {
     */
     async createUser(req: Request, res: Response) {
         // Logic to create a user
+        console.log("Inside userController CreateUser");
+        console.log(req.body);
         const userData = bambooUserSchema.parse(req.body); // VALIDATE USERDATA BEFORE OPERATIONS
+        if (!userData) {
+            return res.status(400).json({ error: "Invalid user data" });
+        }
+        console.log("userData after validation", userData);
         const userService = new UserService();
         try {
             const user = await userService.createUser([userData]);
             res.status(201).json(user); // Respond back to BambooHR
         } catch (error: any) {
+            console.log(error);
             res.status(400).json({ error: error.message });
         }
     }

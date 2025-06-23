@@ -3,14 +3,15 @@ import { addUser } from './userStore';
 
 export class UserService {
     async createUser(userData: any[]) {
+        console.log("Inside UserService createUser");
         const newUser = jsonToScimUser(userData); // pass 'user' or 'group' based on context
-        await addUser(newUser); // Store the user in the database or any storage
+        console.log("New User after conversion to SCIM format:", newUser);
         return newUser;
         // DO NOT RETURN NEWUSER, CONVERT SCIM -> GRAPH MAPPING TO AZURE AD TO CREATE USER IN TENANT
         // USE AXIOS TO MAKE HTTP REQUEST
         // after successful creation, return the status of graph API POST request
     }
-
+/*
     getUser(userId: string) {
         return this.users.find(user => user.id === userId);
     }
@@ -45,4 +46,5 @@ export class UserService {
             emails: [{ value: userData.email }]
         };
     }
+        */
 }

@@ -5,7 +5,7 @@ import { initDB } from './services/userStore';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-initDB(); // Initialize the database
+//initDB(); // Initialize the database
 
 app.use(bodyParser.json());
 app.use(express.json());

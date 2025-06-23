@@ -39,3 +39,9 @@ export async function deleteUser(id: string) {
   db.data!.users = db.data!.users.filter(u => u.id !== id);
   await db.write();
 }
+
+// get all users
+export async function getAllUsers() {
+  await db.read();
+  return db.data!.users;
+}
