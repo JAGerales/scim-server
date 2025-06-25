@@ -1,16 +1,42 @@
 import { jsonToScimUser, jsonToScimGroup } from '../utils/jsonToScim';
-import { addUser } from './userStore';
+import { sendToAzure } from '../utils/graphApi';
+import { scimToGraphUser } from '../utils/scimToGraph';
 
 export class UserService {
     async createUser(userData: any[]) {
+        // NEEDS INPUT VALIDATION AND ERROR HANDLING [TODO]
         console.log("Inside UserService createUser");
-        const newUser = jsonToScimUser(userData); // pass 'user' or 'group' based on context
-        console.log("New User after conversion to SCIM format:", newUser);
-        return newUser;
-        // DO NOT RETURN NEWUSER, CONVERT SCIM -> GRAPH MAPPING TO AZURE AD TO CREATE USER IN TENANT
-        // USE AXIOS TO MAKE HTTP REQUEST
+        const scimUser = jsonToScimUser(userData); // pass 'user' or 'group' based on context
+        console.log("New User after conversion to SCIM format:", scimUser);
+        const graphUser = scimToGraphUser(scimUser); // convert SCIM to Graph format
+        console.log("New User after conversion to GraphAPI format:", graphUser);
+
+        return graphUser;
         // after successful creation, return the status of graph API POST request
     }
+    /*
+    Suggested POST to Azure:
+    // POST to Azure AD via Microsoft Graph API
+        try {
+            const response = await axios.post(
+                'https://graph.microsoft.com/v1.0/users',
+                graphUser,
+                {
+                    headers: {
+                        Authorization: `Bearer ${process.env.AZURE_GRAPH_TOKEN}`,
+                        'Content-Type': 'application/json'
+                    }
+                }
+            );
+            // Optionally, add user to your local user store after successful creation
+            await addUser(scimUser);
+            return response.data; // or return a custom status object
+        } catch (error: any) {
+            console.error("Error creating user in Azure AD:", error.response?.data || error.message);
+            throw new Error(error.response?.data?.error?.message || "Failed to create user in Azure AD");
+        }
+    }
+    */
 /*
     getUser(userId: string) {
         return this.users.find(user => user.id === userId);

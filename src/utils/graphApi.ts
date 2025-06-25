@@ -1,6 +1,11 @@
-/*
+// CREATE POST REQUEST TO AZURE AD USING GRAPH API
 import axios from 'axios';
 
+/*
+1) Get an access token
+2) Use the access token to make requests to the Microsoft Graph API
+  - authorization: `Bearer ${token}`
+*/
 export const sendToAzure = async (user: any, method: 'POST' | 'PATCH' | 'DELETE') => {
   const url = 'https://graph.microsoft.com/v1.0/users';
   const token = process.env.AZURE_BEARER_TOKEN;
@@ -13,6 +18,8 @@ export const sendToAzure = async (user: any, method: 'POST' | 'PATCH' | 'DELETE'
   };
 
   if (method === 'POST') {
-    return await axios.post(url, user, config);
+    const response = await axios.post(url, user, config);
+    return response.data;
   }
 };
+//NEEDADMIN CONSENT FOR APP PERMISSIONS

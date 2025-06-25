@@ -1,8 +1,8 @@
 import { User, Group, CustomUserExtension } from "../types/index";
 
 function jsonToScimUser(rawUser: any): User & CustomUserExtension {
-console.log("Converting raw user to SCIM format:", rawUser);
-console.log("Raw user ID:", rawUser[0].supervisor);
+console.log("Converting raw user to SCIM format...");
+// validate rawUser before proceeding [TODO]
 return {
   schemas: [
     "urn:ietf:params:scim:schemas:core:2.0:User",
