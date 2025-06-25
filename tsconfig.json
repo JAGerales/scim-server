@@ -7,7 +7,11 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "outDir": "./dist",
-    "rootDir": "./src"
+    "rootDir": "./", // Set rootDir to project root to include both src and jobs
+    "baseUrl": ".",
+    "paths": {
+      "@services/*": ["src/services/*"],
+    }
   },
   "include": ["src/**/*", "jobs"],
   "exclude": ["node_modules", "**/*.spec.ts"]
