@@ -17,6 +17,7 @@ export async function initDB() {
 
 export async function addUser(user: User) {
   await db.read();
+  if (db.data!.users.some(u => u.id === user.id)) return; // Prevent duplicate
   db.data!.users.push(user);
   await db.write();
 }

@@ -7,6 +7,7 @@ const subdomain = process.env.BAMBOOHR_SUBDOMAIN;
 const apiKey = process.env.BAMBOOHR_API_KEY;
 
 let lastEmployeeIds = new Set<string>();
+let isPolling = false;
 
 // propsed api endpoint: 
 async function fetchEmployeeDetails(id: string) {
@@ -21,6 +22,8 @@ async function fetchEmployeeDetails(id: string) {
 }
 
 async function fetchEmployees() {
+  if (isPolling) return; // Prevent overlapping polls
+  isPolling = true;
   try {
     const response = await axios.get(`https://api.bamboohr.com/api/gateway.php/${subdomain}/v1/employees/directory`, {
       auth: {
@@ -46,10 +49,17 @@ async function fetchEmployees() {
       console.log('New hires detected:', newHires);
       for (const id of newHires){
         const employeeDetails = await fetchEmployeeDetails(id as string);
-        console.log('Adding new employee:', employeeDetails);
-        await addUser(employeeDetails);
+        console.log('Adding new employee:', employeeDetails.displayName);
+        await addUser(employeeDetails); // may need to validate result before POSTing
         // Send employeeDetails to SCIM endpoint here
-        // await axios.post('https://your-scim-endpoint.com/scim/v2/Users', employeeDetails, {
+        const req = await axios.post('http://localhost:3000/scim/v2/Users', employeeDetails, {
+        });
+        if (req.status === 201 || req.status === 200) {
+          console.log(`Employee ${employeeDetails.id} added to SCIM endpoint successfully`);
+        }
+        else{
+          console.error(`Failed to add employee ${employeeDetails.id} to SCIM endpoint:`, req.statusText);
+        }
         console.log("Employee added to user store");
       }
     }
@@ -63,6 +73,8 @@ async function fetchEmployees() {
     } else {
       console.error('Error fetching employees:', error);
     }
+  } finally {
+    isPolling = false; // Reset polling state
   }
 }
 
@@ -70,23 +82,12 @@ setInterval(fetchEmployees, 60 * 1000); // Poll every 60 seconds
 fetchEmployees(); // Initial call
 
 /* BAMBOO EMPLOYEE OBJECT EXAMPLE
- {
-            "id": "1300",
-            "displayName": "Jacob Gerales",
-            "firstName": "Jacob",
-            "lastName": "Gerales",
-            "preferredName": null,
-            "jobTitle": "IT Intern",
-            "mobilePhone": "5105890502",
-            "workEmail": "jacob.gerales@brightmachines.com",
-            "department": "404 IT",
-            "location": "US - San Francisco",
-            "division": "Bright Machines HQ",
-            "linkedIn": "https://www.linkedin.com/in/jacob-gerales/",
-            "pronouns": null,
-            "supervisor": "Josh Huynh",
-            "photoUploaded": true,
-            "photoUrl": "https://images7.bamboohr.com/402355/photos/1300-2-4.jpg?Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly9pbWFnZXM3LmJhbWJvb2hyLmNvbS80MDIzNTUvKiIsIkNvbmRpdGlvbiI6eyJEYXRlR3JlYXRlclRoYW4iOnsiQVdTOkVwb2NoVGltZSI6MTc1MDcwMjc2Mn0sIkRhdGVMZXNzVGhhbiI6eyJBV1M6RXBvY2hUaW1lIjoxNzUzMjk0NzcyfX19XX0_&Signature=N1RwybmQFmALcJoJm~wAI7ertCiOVhUdaKEpyeB9TQ6-VigBP5znDWopWeTYRyvqa8SN-~6~C5uN5EEFFZSnrZr4qVdhlDpVJRMDOmc17K0MoAiwmTbE5j-e~5bZP9UbFQq65llRAjzRMpMPwv3KThnfGGM-vJqpscA3Nems7uu-W1FAwpWnnzPaWVNRa3Mjq8sI10ddp1feKdSezg8HO8kHzPjmTFDnQg2XXxO8hS0dPEwc5GnufQTyWYKC3HOy2MaFDg0Ix7vSfaawrmZNqloMmqnS4hHZwaO-YgqVNTKdtWJCQj70UkoDtlxtEWRVDkB9GJ2ZhgBQvmAKj1pbfg__&Key-Pair-Id=APKAIZ7QQNDH4DJY7K4Q",
-            "canUploadPhoto": 1
-        },
+
+2) CHECK FOR DUPLICATES BEFORE ADDING THE USER
+export async function addUser(user: User) {
+  await db.read();
+  if (db.data!.users.some(u => u.id === user.id)) return; // Prevent duplicate
+  db.data!.users.push(user);
+  await db.write();
+}
 */

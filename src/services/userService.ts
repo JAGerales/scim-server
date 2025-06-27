@@ -3,7 +3,7 @@ import { sendToAzure } from '../utils/graphApi';
 import { scimToGraphUser } from '../utils/scimToGraph';
 
 export class UserService {
-    async createUser(userData: any[]) {
+    async createUser(userData: any) {
         // NEEDS INPUT VALIDATION AND ERROR HANDLING [TODO]
         console.log("Inside UserService createUser");
         const scimUser = jsonToScimUser(userData); // pass 'user' or 'group' based on context
