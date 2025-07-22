@@ -8,26 +8,29 @@ class UsersController {
         console.log("Inside userController CreateUser");
         console.log(req.body);
 
-        const userService = new UserService();
-        const results = [];
-        const users = Array.isArray(req.body) ? req.body : [req.body]; // Ensure req.body is an array
-
-        for (const user of users) {
-            const userData = bambooUserSchema.safeParse(req.body); // VALIDATE USERDATA BEFORE OPERATIONS
-            if (!userData.success) {
-                results.push({ user, error: userData.error.errors });
-                continue; // Skip this user if validation fails
-            }
-            try {
-                const newUser = await userService.createUser(userData.data);
-                results.push({user: newUser, status: "created"});
-            }
-            catch (error: any) {
-                console.error("Error creating user:", error);
-                results.push({ user, error: error.message });
-            }
+        // Check if the request body is a single JSON object
+        if (typeof req.body !== "object" || req.body === null || Array.isArray(req.body)) {
+            return res.status(400).json({ error: "Request body must be a single user object" });
         }
-        res.status(200).json(results); // 200 for multiple user operations
+        console.log("Before data validation");
+
+        // Validate the user data against the schema
+        const userData = bambooUserSchema.safeParse(req.body);
+        if (!userData.success) {
+            console.log(userData.data);
+            return res.status(400).json({ error: "Invalid user data", details: userData.error.errors });
+        }
+        console.log("After data validation");
+        // If validation passes, proceed to create the user
+        try {
+            const userService = new UserService();
+            const newUser = await userService.createUser(userData.data);
+            return res.status(201).json({ user: newUser, status: "User created successfully" }); 
+        }
+        catch (error: any) {
+            console.error("Error creating user:", error);
+            return res.status(500).json({ error: "Internal server error" });
+        }
     }
 
     getUser(req: Request, res: Response) {

@@ -1,10 +1,11 @@
-const axios = require('axios');
+import axios from 'axios';
 import { initDB, getAllUsers, addUser } from "../src/services/userStore";
-require('dotenv').config();
+const dotenv = require('dotenv');
+dotenv.config();
 
 initDB(); // Initialize the database
 const subdomain = process.env.BAMBOOHR_SUBDOMAIN;
-const apiKey = process.env.BAMBOOHR_API_KEY;
+const apiKey = process.env.BAMBOOHR_API_KEY ?? "";
 
 let lastEmployeeIds = new Set<string>();
 let isPolling = false;
@@ -39,7 +40,7 @@ async function fetchEmployees() {
     console.log(`Fetched ${employees.length} employees from bambooHR`);
 
     const usersInStore = await getAllUsers();
-    const userStoreIds = new Set(usersInStore.map(user => user.id));
+    const userStoreIds = new Set(usersInStore.map((user: { id: any; }) => user.id));
 
     const currentIds = new Set<string>(employees.map((e: { id: string; }) => e.id));
     // Filters out employees that are already in the user store
@@ -47,11 +48,12 @@ async function fetchEmployees() {
 
     if (newHires.length > 0) {
       console.log('New hires detected:', newHires);
-      for (const id of newHires){
+      for (const id of newHires){ // PROCESSES ONE NEW HIRE AT A TIME
         const employeeDetails = await fetchEmployeeDetails(id as string);
-        console.log('Adding new employee:', employeeDetails.displayName);
+        console.log('Adding new employee:', employeeDetails);
         await addUser(employeeDetails); // may need to validate result before POSTing
         // Send employeeDetails to SCIM endpoint here
+        console.log("employeeDetails: ", employeeDetails)
         const req = await axios.post('http://localhost:3000/scim/v2/Users', employeeDetails, {
         });
         if (req.status === 201 || req.status === 200) {
@@ -90,4 +92,16 @@ export async function addUser(user: User) {
   db.data!.users.push(user);
   await db.write();
 }
+  ERROR WHEN USING POLLING JOB:
+  Error fetching employees: Request failed with status code 400
+AxiosError: Request failed with status code 400
+    at settle (C:\Users\Jacob.Gerales\OneDrive - Bright Machines\Desktop\scim-server\scim-server\node_modules\axios\lib\core\settle.js:19:12)
+    at IncomingMessage.handleStreamEnd (C:\Users\Jacob.Gerales\OneDrive - Bright Machines\Desktop\scim-server\scim-server\node_modules\axios\lib\adapters\http.js:599:11)
+    at IncomingMessage.emit (node:events:530:35)
+    at IncomingMessage.emit (node:domain:489:12)
+    at endReadableNT (node:internal/streams/readable:1698:12)
+    at processTicksAndRejections (node:internal/process/task_queues:90:21)
+    at Axios.request (C:\Users\Jacob.Gerales\OneDrive - Bright Machines\Desktop\scim-server\scim-server\node_modules\axios\lib\core\Axios.js:45:41)
+    at processTicksAndRejections (node:internal/process/task_queues:105:5) {
+  code: 'ERR_BAD_REQUEST',
 */

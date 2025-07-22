@@ -4,24 +4,28 @@ import { scimToGraphUser } from '../utils/scimToGraph';
 
 export class UserService {
     async createUser(userData: any) {
-        // NEEDS INPUT VALIDATION AND ERROR HANDLING [TODO]
         console.log("Inside UserService createUser");
-        const scimUser = jsonToScimUser(userData); // pass 'user' or 'group' based on context
+
+        // Validate that userData is not null and has the required properties
+        if (!userData || !userData.workEmail) {
+            throw new Error("Missing required user data");    
+        }
+
+        const scimUser = jsonToScimUser(userData); // convert JSON to SCIM format
         console.log("New User after conversion to SCIM format:", scimUser);
+
         const graphUser = scimToGraphUser(scimUser); // convert SCIM to Graph format
         console.log("New User after conversion to GraphAPI format:", graphUser);
 
-        return graphUser;
-    }
-    /*
-      1. Transform and create user
-        const scimUser = jsonToScimUser(userData); // pass 'user' or 'group' based on context
-        const graphUser = scimToGraphUser(scimUser); // convert SCIM to Graph format
-        const createdUser = await sendToAzure(graphUser, 'POST'); // POST to Graph API
-       2. Assign to groups/DLs after user creation
+        //const createdUser = await sendToAzure(graphUser, 'POST'); // POST to Graph API
+        /*
+        2. Assign to groups/DLs after user creation
         await assignGroupsByDepartment(createdUser);
         await assignGroupsByLocation(createdUser);
+        */
 
+        return graphUser; // return value of createdUser
+    }
 /*
     getUser(userId: string) {
         return this.users.find(user => user.id === userId);
