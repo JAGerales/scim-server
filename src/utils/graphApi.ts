@@ -19,7 +19,8 @@ export const sendToAzure = async (user: any, method: 'POST' | 'PATCH' | 'DELETE'
 
   if (method === 'POST') {
     const response = await axios.post(url, user, config);
-    return response.data;
+    console.log(response.data);
+    return { user: user, status: "User created successfully", statusCode: 201 };
   }
 };
 //NEEDADMIN CONSENT FOR APP PERMISSIONS

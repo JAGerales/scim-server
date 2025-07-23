@@ -2,6 +2,7 @@ import { UserService } from "../services/userService";
 import { GroupService } from "../services/groupService";
 import express, { Request, Response } from 'express';
 import { bambooUserSchema } from "../utils/userValidators";
+import { sendToAzure } from "src/utils/graphApi";
 
 class UsersController {
     async createUser(req: Request, res: Response) {
@@ -25,6 +26,8 @@ class UsersController {
         try {
             const userService = new UserService();
             const newUser = await userService.createUser(userData.data);
+            // if user created successfully, POST newUser to graphApi.ts
+            // await sendToAzure(newUser, 'POST');
             return res.status(201).json({ user: newUser, status: "User created successfully" }); 
         }
         catch (error: any) {
