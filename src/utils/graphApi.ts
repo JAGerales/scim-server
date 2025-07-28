@@ -23,4 +23,3 @@ export const sendToAzure = async (user: any, method: 'POST' | 'PATCH' | 'DELETE'
     return { user: user, status: "User created successfully", statusCode: 201 };
   }
 };
-//NEEDADMIN CONSENT FOR APP PERMISSIONS

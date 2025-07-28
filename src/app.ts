@@ -1,8 +1,9 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import router from './routes/users';
-import { initDB } from './services/userStore';  
-
+import { initDB } from './services/userStore'; 
+import dotenv from 'dotenv'; 
+dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 //initDB(); // Initialize the database
